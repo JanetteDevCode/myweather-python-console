@@ -17,3 +17,19 @@ class WeatherApiRequest:
                 cls.get_darksky_uri(latitude, longitude),
                 {'exclude': exclude}
             )
+
+    @classmethod
+    def get_hourly_weather_json(cls, latitude, longitude):
+        exclude = 'currently,minutely,daily,flags'
+        return ApiRequest.make_api_request(
+                cls.get_darksky_uri(latitude, longitude),
+                {'exclude': exclude}
+            )
+
+    @classmethod
+    def get_daily_weather_json(cls, latitude, longitude):
+        exclude = 'currently,minutely,hourly,flags'
+        return ApiRequest.make_api_request(
+                cls.get_darksky_uri(latitude, longitude),
+                {'exclude': exclude}
+            )

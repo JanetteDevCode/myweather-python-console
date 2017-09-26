@@ -37,4 +37,7 @@ else:
     print("Latitude: {0}, Longitude: {1}".format(latitude, longitude))
 
 weather = Weather(zip_code, latitude, longitude)
-weather.get_current_weather()
+# weather.get_current_weather()
+# weather.get_hourly_weather()
+# weather.get_daily_weather()
+weather.get_today_weather()
