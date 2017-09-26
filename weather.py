@@ -30,28 +30,27 @@ class Weather:
                 self.display_alerts(weather_timezone, weather_json['alerts'])
 
             if 'currently' in weather_json:
-                print()
-                print("--------------------{0}".format('-' * len(self.__zip_code)))
-                print("Current Weather for {0}".format(self.__zip_code))
-                print("--------------------{0}".format('-' * len(self.__zip_code)))
-                print()
+                self.display_currently(weather_timezone, weather_json['currently'])
 
-                for k, v in weather_json['currently'].items():
-                    label = k.replace(k[0], k[0].upper(), 1)
-                    label = re.findall('[A-Z][^A-Z]*', label)
-                    label = ' '.join(label) + ':'
-                    if k == 'time':
-                        currently_time = datetime.fromtimestamp(v, weather_timezone)
-                        print("Date: {:%Y-%m-%d}".format(currently_time))
-                        print("Time: {:%I:%M:%S %p %Z}".format(currently_time))
-                    else:
-                        print("{0:<30} {1:>15} ({2})".format(label, v, type(v)))
+    def display_datablock(self, timezone, datablock={}):
+        print('-' * 80)
+        for k, v in datablock.items():
+            label = k.replace(k[0], k[0].upper(), 1)
+            label = re.findall('[A-Z][^A-Z]*', label)
+            label = ' '.join(label) + ':'
+            if 'Time' in label:
+                datablock_time = datetime.fromtimestamp(v, timezone)
+                formatted_datablock_time = "{:%Y-%m-%d %I:%M:%S %p %Z}".format(datablock_time)
+                print("{0:<30} {1:>30}".format(label, formatted_datablock_time))
+            else:
+                print("{0:<30} {1:>30} ({2})".format(label, v, type(v)))
+            print('-' * 80)
 
     def display_alerts(self, timezone, alerts={}):
         print()
-        print("-------------------{0}".format('-' * len(self.__zip_code)))
+        print("==================={0}".format('=' * len(self.__zip_code)))
         print("Weather Alerts for {0}".format(self.__zip_code))
-        print("-------------------{0}".format('-' * len(self.__zip_code)))
+        print("==================={0}".format('=' * len(self.__zip_code)))
         print()
 
         for i, alert in enumerate(alerts, start=1):
@@ -78,3 +77,12 @@ class Weather:
             print(alert['description'])
             print("Additional Info: {0}".format(alert['uri']))
         print('*' * 80)
+
+    def display_currently(self, timezone, currently={}):
+        print()
+        print("===================={0}".format('=' * len(self.__zip_code)))
+        print("Current Weather for {0}".format(self.__zip_code))
+        print("===================={0}".format('=' * len(self.__zip_code)))
+        print()
+
+        self.display_datablock(timezone, currently)
