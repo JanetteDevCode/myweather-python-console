@@ -1,49 +1,6 @@
-import datetime, json, pytz, re, requests, sys
-
-
-class ApiRequest:
-    @classmethod
-    def make_api_request(cls, uri='', params={}, timeout=10):
-        try:
-            req = requests.get(uri, params=params, timeout=timeout)
-            # print(req.url)
-            return req.json()
-        except Exception as e:
-            return {'error': e}
-
-
-class Geocode:
-    googlemapsgeocoding_api_key = 'AIzaSyBO5h570rjeDP9Cz8KkCeAFwX-NHu0fLkQ'
-
-    @classmethod
-    def get_googlemapsgeocoding_uri(cls):
-        return ('https://maps.googleapis.com/maps/api/geocode/json')
-
-    @classmethod
-    def get_geocode_json(cls, zip_code):
-        return ApiRequest.make_api_request(
-                cls.get_googlemapsgeocoding_uri(),
-                {'components': 'postal_code:' + zip_code,
-                'key': Geocode.googlemapsgeocoding_api_key}
-            )
-
-
-class Weather:
-    darksky_api_key = '7f560844e81c036d5e8beafb449eda24'
-
-    @classmethod
-    def get_darksky_uri(cls, latitude, longitude):
-        return ('https://api.darksky.net/forecast/'
-            + Weather.darksky_api_key + '/'
-            + str(latitude) + ',' + str(longitude))
-
-    @classmethod
-    def get_current_weather_json(cls, latitude, longitude):
-        exclude = 'minutely,hourly,daily,flags'
-        return ApiRequest.make_api_request(
-                cls.get_darksky_uri(latitude, longitude),
-                {'exclude': exclude}
-            )
+import datetime, pytz, re, sys
+from geocode_api_request import GeocodeApiRequest
+from weather_api_request import WeatherApiRequest
 
 
 print("-----------------------------")
@@ -52,7 +9,7 @@ print("-----------------------------")
 print()
 
 zip_code = input("Enter ZIP code: ")
-geocode_json = Geocode.get_geocode_json(zip_code)
+geocode_json = GeocodeApiRequest.get_geocode_json(zip_code)
 
 if geocode_json['status'] != 'OK' or 'error' in geocode_json:
     print("Error! Could not retrieve geocode data.")
@@ -64,7 +21,8 @@ else:
     print("ZIP Code: {0}".format(zip_code))
     print("Latitude: {0}, Longitude: {1}".format(latitude, longitude))
 
-current_weather_json = Weather.get_current_weather_json(latitude, longitude)
+current_weather_json = WeatherApiRequest.get_current_weather_json(
+    latitude, longitude)
 
 print()
 print("Current Weather for {0}".format(zip_code))
