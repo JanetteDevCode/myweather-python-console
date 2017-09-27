@@ -10,6 +10,20 @@ class Weather:
         self.__latitude = latitude
         self.__longitude = longitude
 
+    def get_weather_alerts(self):
+        weather_json = WeatherApiRequest.get_weather_alerts(
+            self.__latitude, self.__longitude)
+
+        if 'error' in weather_json:
+            print("Error! Could not retrieve weather alerts.")
+        else:
+            weather_timezone = timezone(weather_json['timezone'])
+
+            if 'alerts' in weather_json:
+                self.display_alerts(weather_timezone, weather_json['alerts'])
+            else:
+                print("There are no weather alerts for your location.")
+
     def get_current_weather(self):
         weather_json = WeatherApiRequest.get_current_weather_json(
             self.__latitude, self.__longitude)
@@ -20,7 +34,7 @@ class Weather:
             weather_timezone = timezone(weather_json['timezone'])
 
             if 'alerts' in weather_json:
-                self.display_alerts(weather_timezone, weather_json['alerts'])
+                self.display_alerts_count(weather_json['alerts'])
 
             if 'currently' in weather_json:
                 self.display_currently(weather_timezone, weather_json['currently'])
@@ -35,7 +49,7 @@ class Weather:
             weather_timezone = timezone(weather_json['timezone'])
 
             if 'alerts' in weather_json:
-                self.display_alerts(weather_timezone, weather_json['alerts'])
+                self.display_alerts_count(weather_json['alerts'])
 
             if 'hourly' in weather_json:
                 self.display_hourly(weather_timezone, weather_json['hourly']['data'])
@@ -50,7 +64,7 @@ class Weather:
             weather_timezone = timezone(weather_json['timezone'])
 
             if 'alerts' in weather_json:
-                self.display_alerts(weather_timezone, weather_json['alerts'])
+                self.display_alerts_count(weather_json['alerts'])
 
             if 'daily' in weather_json:
                 self.display_daily(weather_timezone, weather_json['daily']['data'])
@@ -65,7 +79,7 @@ class Weather:
             weather_timezone = timezone(weather_json['timezone'])
 
             if 'alerts' in weather_json:
-                self.display_alerts(weather_timezone, weather_json['alerts'])
+                self.display_alerts_count(weather_json['alerts'])
 
             if 'daily' in weather_json:
                 self.display_today(weather_timezone, weather_json['daily']['data'][0])
@@ -93,7 +107,18 @@ class Weather:
             self.display_datablock(timezone, datablock_array[i])
         print('*' * 80)
 
-    def display_alerts(self, timezone, alerts={}):
+    def display_alerts_count(self, alerts=[]):
+        alerts_count = len(alerts)
+
+        if alerts_count == 0:
+            print("There are no weather alerts for your location.")
+        elif alerts_count == 1:
+            print("!!! There is 1 weather alert for your location. !!!")
+        else:
+            print("!!! There are {0} weather alerts for your location. !!!"
+                .format(alerts_count))
+
+    def display_alerts(self, timezone, alerts=[]):
         print()
         print("==================={0}".format('=' * len(self.__zip_code)))
         print("Weather Alerts for {0}".format(self.__zip_code))

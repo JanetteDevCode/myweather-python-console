@@ -20,6 +20,7 @@ def display_weather_choice_menu():
         print("'{0}' - {1}".format(
             weather_choices[choice]['id'],
             weather_choices[choice]['description']))
+    print("'Q' - Quit")
     print()
 
 def process_weather_choice(choice=''):
@@ -29,20 +30,20 @@ def process_weather_choice(choice=''):
         print("Goodbye.")
         return False
     elif choice == weather_choices['currently']['id']:
-        # weather.get_current_weather()
-        print(weather_choices['currently']['description'])
+        weather.get_current_weather()
+        # print(weather_choices['currently']['description'])
     elif choice == weather_choices['hourly']['id']:
-        # weather.get_hourly_weather()
-        print(weather_choices['hourly']['description'])
+        weather.get_hourly_weather()
+        # print(weather_choices['hourly']['description'])
     elif choice == weather_choices['today']['id']:
-        # weather.get_today_weather()
-        print(weather_choices['today']['description'])
+        weather.get_today_weather()
+        # print(weather_choices['today']['description'])
     elif choice == weather_choices['daily']['id']:
-        # weather.get_daily_weather()
-        print(weather_choices['daily']['description'])
+        weather.get_daily_weather()
+        # print(weather_choices['daily']['description'])
     elif choice == weather_choices['alerts']['id']:
-        # weather.get_weather_alerts()
-        print(weather_choices['alerts']['description'])
+        weather.get_weather_alerts()
+        # print(weather_choices['alerts']['description'])
     else:
         print("Invalid selection.")
     print()
@@ -86,6 +87,9 @@ weather = Weather(zip_code, latitude, longitude)
 
 while True:
     display_weather_choice_menu()
-    choice = input("Enter choice ('Q' to quit): ")
+    choice = input("Enter weather report choice: ")
     if not process_weather_choice(choice):
         break
+    else:
+        input("--- Press 'Enter' to continue. ---")
+        print()
