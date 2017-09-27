@@ -84,6 +84,25 @@ class Weather:
             if 'daily' in weather_json:
                 self.display_today(weather_timezone, weather_json['daily']['data'][0])
 
+    def format_long_date(self, datetime):
+        dayofweek = "{:%A}".format(datetime)
+        month = "{:%B}".format(datetime)
+        dayofmonth = "{:%d}".format(datetime).lstrip('0')
+        year = "{:%Y}".format(datetime)
+        return ("{dayofweek} {month} {dayofmonth}, {year}"
+            .format(dayofweek=dayofweek, month=month, dayofmonth=dayofmonth, year=year))
+
+    def format_long_time(self, datetime):
+        hour = "{:%I}".format(datetime).lstrip('0')
+        minutes = "{:%M}".format(datetime)
+        ampm = "{:%p}".format(datetime)
+        timezone = "{:%Z}".format(datetime)
+        return ("{hour}:{minutes} {ampm} {timezone}"
+            .format(hour=hour, minutes=minutes, ampm=ampm, timezone=timezone))
+
+    def format_datapoint(self, label, value='n/a', unit=' '):
+        return ("{0:<18} {1:>10} {2:<10}".format(label, value, unit))
+
     def display_datablock(self, timezone, datablock={}):
         for k, v in datablock.items():
             print('-' * 80)
@@ -132,9 +151,13 @@ class Weather:
             print(alert['severity'].upper(), end=': ')
             print(alert['title'])
             alert_time = datetime.fromtimestamp(alert['time'], timezone)
-            print("Issued at: {:%Y-%m-%d %I:%M:%S %p %Z}".format(alert_time))
+            print("Issued at: {date} {time}"
+                .format(date=self.format_long_date(alert_time),
+                    time=self.format_long_time(alert_time)))
             alert_expires = datetime.fromtimestamp(alert['expires'], timezone)
-            print("Expires at: {:%Y-%m-%d %I:%M:%S %p %Z}".format(alert_expires))
+            print("Expires at: {date} {time}"
+                .format(date=self.format_long_date(alert_expires),
+                    time=self.format_long_time(alert_expires)))
             print()
             print("Regions affected:", end=' ')
             alert_regions = alert['regions']
@@ -161,7 +184,101 @@ class Weather:
         print("===================={0}".format('=' * len(self.__zip_code)))
         print()
 
-        self.display_datablock(timezone, currently)
+        # self.display_datablock(timezone, currently)
+
+        currently_datetime = datetime.fromtimestamp(currently['time'], timezone)
+
+        print("{0:<60}{1:>20}".format(self.format_long_date(currently_datetime),
+                    self.format_long_time(currently_datetime)))
+
+        # Summary block
+        # temperature    summary    precip_probability precip_type
+        print('-' * 80)
+        if 'temperature' in currently:
+            temperature = round(currently['temperature'])
+            print("{0:>3} {1:<22}".format(temperature, '\u00b0F'), end='')
+        if 'summary' in currently:
+            summary = currently['summary']
+            print("{0:^27}".format(summary), end='')
+        if 'precipProbability' in currently:
+            precip_probability = currently['precipProbability'] * 100
+            if 'precipType' in currently:
+                precip_type = currently['precipType']
+            else:
+                precip_type = "rain"
+            precip = ("{0} {1} chance of {2}"
+                .format(precip_probability, '%', precip_type))
+            print("{0:>27}".format(precip))
+        print('-' * 80)
+
+        # Details block
+        # humidity    pressure
+        label = "Humidity:"
+        if 'humidity' in currently:
+            humidity = currently['humidity'] * 100
+            print(self.format_datapoint(label, humidity, '%'), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Pressure:"
+        if 'pressure' in currently:
+            pressure = round(currently['pressure'], 1)
+            print(self.format_datapoint(label, pressure, 'mbar'))
+        else:
+            print(self.format_datapoint(label))
+
+        # dew_point    uv_index
+        label = "Dew Point:"
+        if 'dewPoint' in currently:
+            dew_point = round(currently['dewPoint'])
+            print(self.format_datapoint(label, dew_point, '\u00b0F'), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "UV Index:"
+        if 'uvIndex' in currently:
+            uv_index = currently['uvIndex']
+            print(self.format_datapoint(label, uv_index, ''))
+        else:
+            print(self.format_datapoint(label))
+
+        # visibility    cloud_cover
+        label = "Visibility:"
+        if 'visibility' in currently:
+            visibility = round(currently['visibility'])
+            print(self.format_datapoint(label, visibility, 'mi'), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Cloud Cover:"
+        if 'cloudCover' in currently:
+            cloud_cover = currently['cloudCover'] * 100
+            print(self.format_datapoint(label, cloud_cover, '%'))
+        else:
+            print(self.format_datapoint(label))
+
+        # wind    nearest_storm
+        label = "Wind:"
+        if 'windSpeed' in currently:
+            wind_speed = round(currently['windSpeed'])
+            if 'windBearing' in currently:
+                wind_bearing = currently['windBearing']
+            else:
+                wind_bearing = ''
+            wind = ("{0} {1}".format(wind_bearing, wind_speed))
+            print(self.format_datapoint(label, wind, 'mph'), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Nearest Storm:"
+        if 'nearestStormDistance' in currently:
+            nearest_storm_distance = round(currently['nearestStormDistance'])
+            if 'nearestStormBearing' in currently:
+                nearest_storm_bearing = currently['nearestStormBearing']
+            else:
+                nearest_storm_bearing = ''
+            nearest_storm = ("{0} {1}"
+                .format(nearest_storm_bearing, nearest_storm_distance))
+            print(self.format_datapoint(label, nearest_storm, 'mi'))
+        else:
+            print(self.format_datapoint(label))
+        print()
 
     def display_hourly(self, timezone, hourly=[]):
         print()
