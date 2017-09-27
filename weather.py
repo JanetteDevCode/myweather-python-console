@@ -201,7 +201,7 @@ class Weather:
             summary = currently['summary']
             print("{0:^27}".format(summary), end='')
         if 'precipProbability' in currently:
-            precip_probability = currently['precipProbability'] * 100
+            precip_probability = round(currently['precipProbability'] * 100)
             if 'precipType' in currently:
                 precip_type = currently['precipType']
             else:
@@ -215,13 +215,13 @@ class Weather:
         # humidity    pressure
         label = "Humidity:"
         if 'humidity' in currently:
-            humidity = currently['humidity'] * 100
+            humidity = round(currently['humidity'] * 100)
             print(self.format_datapoint(label, humidity, '%'), end='')
         else:
             print(self.format_datapoint(label), end='')
         label = "Pressure:"
         if 'pressure' in currently:
-            pressure = round(currently['pressure'], 1)
+            pressure = round(currently['pressure'])
             print(self.format_datapoint(label, pressure, 'mbar'))
         else:
             print(self.format_datapoint(label))
@@ -249,7 +249,7 @@ class Weather:
             print(self.format_datapoint(label), end='')
         label = "Cloud Cover:"
         if 'cloudCover' in currently:
-            cloud_cover = currently['cloudCover'] * 100
+            cloud_cover = round(currently['cloudCover'] * 100)
             print(self.format_datapoint(label, cloud_cover, '%'))
         else:
             print(self.format_datapoint(label))
