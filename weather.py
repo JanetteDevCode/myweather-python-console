@@ -148,7 +148,11 @@ class Weather:
             print("Description:")
             print(alert['description'])
             print("Additional Info: {0}".format(alert['uri']))
-        print('*' * 80)
+            print('*' * 80)
+            if i < len(alerts):
+                print()
+                input("--- Press 'Enter' to display the next alert. --- ")
+                print()
 
     def display_currently(self, timezone, currently={}):
         print()

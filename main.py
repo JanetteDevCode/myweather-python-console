@@ -91,5 +91,5 @@ while True:
     if not process_weather_choice(choice):
         break
     else:
-        input("--- Press 'Enter' to continue. ---")
+        input("--- Press 'Enter' to continue. --- ")
         print()
