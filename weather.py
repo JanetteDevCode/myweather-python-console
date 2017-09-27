@@ -1,4 +1,4 @@
-import re
+import math, re
 from datetime import datetime
 from pytz import timezone
 from weather_api_request import WeatherApiRequest
@@ -83,6 +83,32 @@ class Weather:
 
             if 'daily' in weather_json:
                 self.display_today(weather_timezone, weather_json['daily']['data'][0])
+
+    def calculate_cardinal_direction(self, angle):
+        cardinal_directions = [
+            "N", # 0: < 11.25, >= 348.75
+            "NNE", # 1: < 33.75
+            "NE", # 2: < 56.25
+            "ENE", # 3: < 78.75
+            "E", # 4: < 101.25
+            "ESE", # 5: < 123.75
+            "SE", # 6: < 146.25
+            "SSE", # 7: < 168.75
+            "S", # 8: < 191.25
+            "SSW", # 9: < 213.75
+            "SW", # 10: < 236.25
+            "WSW", # 11: < 258.75
+            "W", # 12: < 281.25
+            "WNW", # 13: < 303.75
+            "NW", # 14: < 326.25
+            "NNW" # 15: < 348.75
+        ]
+
+        if isinstance(angle, float) or isinstance(angle, int):
+            i = math.floor(angle / 22.5 + 0.5) % 16
+            return cardinal_directions[i]
+        else:
+            return ''
 
     def format_long_date(self, datetime):
         dayofweek = "{:%A}".format(datetime)
@@ -192,23 +218,24 @@ class Weather:
                     self.format_long_time(currently_datetime)))
 
         # Summary block
-        # temperature    summary    precip_probability precip_type
+        # temperature    summary    precip
         print('-' * 80)
         if 'temperature' in currently:
             temperature = round(currently['temperature'])
-            print("{0:>3} {1:<22}".format(temperature, '\u00b0F'), end='')
+            print("    {0:>3} {1:<16}".format(temperature, '\u00b0F'), end='')
         if 'summary' in currently:
             summary = currently['summary']
-            print("{0:^27}".format(summary), end='')
+            print("{0:^26}".format(summary), end='')
+        # precip
         if 'precipProbability' in currently:
             precip_probability = round(currently['precipProbability'] * 100)
             if 'precipType' in currently:
-                precip_type = currently['precipType']
+                precip_type = currently['precipType'].title()
             else:
-                precip_type = "rain"
-            precip = ("{0} {1} chance of {2}"
+                precip_type = "Rain"
+            precip = ("{0} {1} Chance of {2}"
                 .format(precip_probability, '%', precip_type))
-            print("{0:>27}".format(precip))
+            print("{0:>26}    ".format(precip))
         print('-' * 80)
 
         # Details block
@@ -259,7 +286,7 @@ class Weather:
         if 'windSpeed' in currently:
             wind_speed = round(currently['windSpeed'])
             if 'windBearing' in currently:
-                wind_bearing = currently['windBearing']
+                wind_bearing = self.calculate_cardinal_direction(currently['windBearing'])
             else:
                 wind_bearing = ''
             wind = ("{0} {1}".format(wind_bearing, wind_speed))
@@ -270,7 +297,7 @@ class Weather:
         if 'nearestStormDistance' in currently:
             nearest_storm_distance = round(currently['nearestStormDistance'])
             if 'nearestStormBearing' in currently:
-                nearest_storm_bearing = currently['nearestStormBearing']
+                nearest_storm_bearing = self.calculate_cardinal_direction(currently['nearestStormBearing'])
             else:
                 nearest_storm_bearing = ''
             nearest_storm = ("{0} {1}"
