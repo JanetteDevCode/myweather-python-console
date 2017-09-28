@@ -167,6 +167,64 @@ class Weather:
             self.display_datablock(timezone, datablock_array[i])
         print('*' * 80)
 
+    def display_shared_currently_today(self, datablock={}):
+        # Display data points common to both current and today's weather:
+        # Humidity:      xxx           Pressure:       xxx
+        # Dew Point:     xxx           UV Index:       xxx
+        # Visibility:    xxx           Cloud Cover:    xxx
+        # Wind:          xxx
+
+        label = "Humidity:"
+        if 'humidity' in datablock:
+            humidity = round(datablock['humidity'] * 100)
+            print(self.format_datapoint(label, humidity, Weather.us_units['humidity']), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Pressure:"
+        if 'pressure' in datablock:
+            pressure = round(datablock['pressure'])
+            print(self.format_datapoint(label, pressure, Weather.us_units['pressure']))
+        else:
+            print(self.format_datapoint(label))
+
+        label = "Dew Point:"
+        if 'dewPoint' in datablock:
+            dew_point = round(datablock['dewPoint'])
+            print(self.format_datapoint(label, dew_point, Weather.us_units['dewPoint']), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "UV Index:"
+        if 'uvIndex' in datablock:
+            uv_index = datablock['uvIndex']
+            print(self.format_datapoint(label, uv_index, Weather.us_units['uvIndex']))
+        else:
+            print(self.format_datapoint(label))
+
+        label = "Visibility:"
+        if 'visibility' in datablock:
+            visibility = round(datablock['visibility'])
+            print(self.format_datapoint(label, visibility, Weather.us_units['visibility']), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Cloud Cover:"
+        if 'cloudCover' in datablock:
+            cloud_cover = round(datablock['cloudCover'] * 100)
+            print(self.format_datapoint(label, cloud_cover, Weather.us_units['cloudCover']))
+        else:
+            print(self.format_datapoint(label))
+
+        label = "Wind:"
+        if 'windSpeed' in datablock:
+            wind_speed = round(datablock['windSpeed'])
+            if 'windBearing' in datablock:
+                wind_bearing = self.calculate_cardinal_direction(datablock['windBearing'])
+            else:
+                wind_bearing = ''
+            wind = ("{0} {1}".format(wind_bearing, wind_speed))
+            print(self.format_datapoint(label, wind, Weather.us_units['windSpeed']), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+
     def display_alerts_count(self, alerts=[]):
         alerts_count = len(alerts)
 
@@ -233,7 +291,9 @@ class Weather:
                     self.format_long_time(currently_datetime)))
 
         # Summary block
-        # temperature    summary    precip
+        # --------------------------------------------------------------------------------
+        #     Temp                       Summary                      Chance of Precip
+        # --------------------------------------------------------------------------------
         print('-' * 80)
         if 'temperature' in currently:
             temperature = round(currently['temperature'])
@@ -241,7 +301,6 @@ class Weather:
         if 'summary' in currently:
             summary = currently['summary']
             print("{0:^26}".format(summary), end='')
-        # precip
         if 'precipProbability' in currently:
             precip_probability = round(currently['precipProbability'] * 100)
             if 'precipType' in currently:
@@ -254,60 +313,7 @@ class Weather:
         print('-' * 80)
 
         # Details block
-        # humidity    pressure
-        label = "Humidity:"
-        if 'humidity' in currently:
-            humidity = round(currently['humidity'] * 100)
-            print(self.format_datapoint(label, humidity, Weather.us_units['humidity']), end='')
-        else:
-            print(self.format_datapoint(label), end='')
-        label = "Pressure:"
-        if 'pressure' in currently:
-            pressure = round(currently['pressure'])
-            print(self.format_datapoint(label, pressure, Weather.us_units['pressure']))
-        else:
-            print(self.format_datapoint(label))
-
-        # dew_point    uv_index
-        label = "Dew Point:"
-        if 'dewPoint' in currently:
-            dew_point = round(currently['dewPoint'])
-            print(self.format_datapoint(label, dew_point, Weather.us_units['dewPoint']), end='')
-        else:
-            print(self.format_datapoint(label), end='')
-        label = "UV Index:"
-        if 'uvIndex' in currently:
-            uv_index = currently['uvIndex']
-            print(self.format_datapoint(label, uv_index, Weather.us_units['uvIndex']))
-        else:
-            print(self.format_datapoint(label))
-
-        # visibility    cloud_cover
-        label = "Visibility:"
-        if 'visibility' in currently:
-            visibility = round(currently['visibility'])
-            print(self.format_datapoint(label, visibility, Weather.us_units['visibility']), end='')
-        else:
-            print(self.format_datapoint(label), end='')
-        label = "Cloud Cover:"
-        if 'cloudCover' in currently:
-            cloud_cover = round(currently['cloudCover'] * 100)
-            print(self.format_datapoint(label, cloud_cover, Weather.us_units['cloudCover']))
-        else:
-            print(self.format_datapoint(label))
-
-        # wind    nearest_storm
-        label = "Wind:"
-        if 'windSpeed' in currently:
-            wind_speed = round(currently['windSpeed'])
-            if 'windBearing' in currently:
-                wind_bearing = self.calculate_cardinal_direction(currently['windBearing'])
-            else:
-                wind_bearing = ''
-            wind = ("{0} {1}".format(wind_bearing, wind_speed))
-            print(self.format_datapoint(label, wind, Weather.us_units['windSpeed']), end='')
-        else:
-            print(self.format_datapoint(label), end='')
+        self.display_shared_currently_today(currently)
         label = "Nearest Storm:"
         if 'nearestStormDistance' in currently:
             nearest_storm_distance = round(currently['nearestStormDistance'])
