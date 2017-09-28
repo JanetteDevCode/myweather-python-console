@@ -9,6 +9,7 @@ class Weather:
         'cloudCover': '%',
         'dewPoint': '\u00b0F',
         'humidity': '%',
+        'moonPhase': ' ',
         'nearestStormDistance': 'mi',
         'precipProbability': '%',
         'pressure': 'mbar',
@@ -143,6 +144,13 @@ class Weather:
 
     def format_datapoint(self, label, value='n/a', unit=' '):
         return ("{0:<18} {1:>10} {2:<10}".format(label, value, unit))
+
+    def format_datapoint_time(self, datetime):
+        hour = "{:%I}".format(datetime).lstrip('0')
+        minutes = "{:%M}".format(datetime)
+        hour_minutes = ("{hour}:{minutes}".format(hour=hour, minutes=minutes))
+        ampm = "{:%p}".format(datetime)
+        return {'hour_minutes': hour_minutes, 'ampm': ampm}
 
     def display_datablock(self, timezone, datablock={}):
         for k, v in datablock.items():
@@ -353,4 +361,63 @@ class Weather:
         print("===================={0}".format('=' * len(self.__zip_code)))
         print()
 
-        self.display_datablock(timezone, today)
+        # self.display_datablock(timezone, today)
+
+        today_datetime = datetime.fromtimestamp(today['time'], timezone)
+
+        print("{0:<60}".format(self.format_long_date(today_datetime)))
+
+        # Summary block
+        # --------------------------------------------------------------------------------
+        #     High Temp                                                        Summary
+        #     Low Temp                                                Chance of Precip
+        # --------------------------------------------------------------------------------
+        print('-' * 80)
+        # row 1
+        if 'temperatureHigh' in today:
+            temperature_high = round(today['temperatureHigh'])
+            print("    {0:>3} {1:<2} {2:<13}".format(
+                temperature_high, Weather.us_units['temperatureHigh'], "High"), end='')
+        if 'summary' in today:
+            summary = today['summary']
+            print("{0:>52}    ".format(summary))
+        # row 2
+        if 'temperatureLow' in today:
+            temperature_low = round(today['temperatureLow'])
+            print("    {0:>3} {1:<2} {2:<13}".format(
+                temperature_low, Weather.us_units['temperatureLow'], "Low"), end='')
+        if 'precipProbability' in today:
+            precip_probability = round(today['precipProbability'] * 100)
+            if 'precipType' in today:
+                precip_type = today['precipType'].title()
+            else:
+                precip_type = "Rain"
+            precip = ("{0} {1} Chance of {2}"
+                .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
+            print("{0:>52}    ".format(precip))
+        print('-' * 80)
+
+        # Details block
+        self.display_shared_currently_today(today)
+        label = "Moon Phase:"
+        if 'moonPhase' in today:
+            moon_phase = today['moonPhase']
+            print(self.format_datapoint(label, moon_phase, Weather.us_units['moonPhase']))
+        else:
+            print(self.format_datapoint(label))
+
+        label = "Sunrise:"
+        if 'sunriseTime' in today:
+            sunrise_datetime = datetime.fromtimestamp(today['sunriseTime'], timezone)
+            sunrise_time = self.format_datapoint_time(sunrise_datetime)
+            print(self.format_datapoint(label, sunrise_time['hour_minutes'], sunrise_time['ampm']), end='')
+        else:
+            print(self.format_datapoint(label), end='')
+        label = "Sunset:"
+        if 'sunsetTime' in today:
+            sunset_datetime = datetime.fromtimestamp(today['sunsetTime'], timezone)
+            sunset_time = self.format_datapoint_time(sunset_datetime)
+            print(self.format_datapoint(label, sunset_time['hour_minutes'], sunset_time['ampm']))
+        else:
+            print(self.format_datapoint(label))
+        print()
