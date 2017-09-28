@@ -5,6 +5,21 @@ from weather_api_request import WeatherApiRequest
 
 
 class Weather:
+    us_units = {
+        'cloudCover': '%',
+        'dewPoint': '\u00b0F',
+        'humidity': '%',
+        'nearestStormDistance': 'mi',
+        'precipProbability': '%',
+        'pressure': 'mbar',
+        'temperature': '\u00b0F',
+        'temperatureHigh': '\u00b0F',
+        'temperatureLow': '\u00b0F',
+        'visibility': 'mi',
+        'uvIndex': ' ',
+        'windSpeed': 'mph'
+    }
+
     def __init__(self, zip_code, latitude, longitude):
         self.__zip_code = zip_code
         self.__latitude = latitude
@@ -222,7 +237,7 @@ class Weather:
         print('-' * 80)
         if 'temperature' in currently:
             temperature = round(currently['temperature'])
-            print("    {0:>3} {1:<16}".format(temperature, '\u00b0F'), end='')
+            print("    {0:>3} {1:<16}".format(temperature, Weather.us_units['temperature']), end='')
         if 'summary' in currently:
             summary = currently['summary']
             print("{0:^26}".format(summary), end='')
@@ -234,7 +249,7 @@ class Weather:
             else:
                 precip_type = "Rain"
             precip = ("{0} {1} Chance of {2}"
-                .format(precip_probability, '%', precip_type))
+                .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
             print("{0:>26}    ".format(precip))
         print('-' * 80)
 
@@ -243,13 +258,13 @@ class Weather:
         label = "Humidity:"
         if 'humidity' in currently:
             humidity = round(currently['humidity'] * 100)
-            print(self.format_datapoint(label, humidity, '%'), end='')
+            print(self.format_datapoint(label, humidity, Weather.us_units['humidity']), end='')
         else:
             print(self.format_datapoint(label), end='')
         label = "Pressure:"
         if 'pressure' in currently:
             pressure = round(currently['pressure'])
-            print(self.format_datapoint(label, pressure, 'mbar'))
+            print(self.format_datapoint(label, pressure, Weather.us_units['pressure']))
         else:
             print(self.format_datapoint(label))
 
@@ -257,13 +272,13 @@ class Weather:
         label = "Dew Point:"
         if 'dewPoint' in currently:
             dew_point = round(currently['dewPoint'])
-            print(self.format_datapoint(label, dew_point, '\u00b0F'), end='')
+            print(self.format_datapoint(label, dew_point, Weather.us_units['dewPoint']), end='')
         else:
             print(self.format_datapoint(label), end='')
         label = "UV Index:"
         if 'uvIndex' in currently:
             uv_index = currently['uvIndex']
-            print(self.format_datapoint(label, uv_index, ''))
+            print(self.format_datapoint(label, uv_index, Weather.us_units['uvIndex']))
         else:
             print(self.format_datapoint(label))
 
@@ -271,13 +286,13 @@ class Weather:
         label = "Visibility:"
         if 'visibility' in currently:
             visibility = round(currently['visibility'])
-            print(self.format_datapoint(label, visibility, 'mi'), end='')
+            print(self.format_datapoint(label, visibility, Weather.us_units['visibility']), end='')
         else:
             print(self.format_datapoint(label), end='')
         label = "Cloud Cover:"
         if 'cloudCover' in currently:
             cloud_cover = round(currently['cloudCover'] * 100)
-            print(self.format_datapoint(label, cloud_cover, '%'))
+            print(self.format_datapoint(label, cloud_cover, Weather.us_units['cloudCover']))
         else:
             print(self.format_datapoint(label))
 
@@ -290,7 +305,7 @@ class Weather:
             else:
                 wind_bearing = ''
             wind = ("{0} {1}".format(wind_bearing, wind_speed))
-            print(self.format_datapoint(label, wind, 'mph'), end='')
+            print(self.format_datapoint(label, wind, Weather.us_units['windSpeed']), end='')
         else:
             print(self.format_datapoint(label), end='')
         label = "Nearest Storm:"
@@ -302,7 +317,7 @@ class Weather:
                 nearest_storm_bearing = ''
             nearest_storm = ("{0} {1}"
                 .format(nearest_storm_bearing, nearest_storm_distance))
-            print(self.format_datapoint(label, nearest_storm, 'mi'))
+            print(self.format_datapoint(label, nearest_storm, Weather.us_units['nearestStormDistance']))
         else:
             print(self.format_datapoint(label))
         print()
