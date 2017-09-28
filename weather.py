@@ -126,6 +126,27 @@ class Weather:
         else:
             return ''
 
+    def calculate_moon_phase(self, lunation_fraction):
+        if not (isinstance(lunation_fraction, float) or isinstance(lunation_fraction, int)):
+            return ['', '']
+
+        if lunation_fraction == 0:
+            return ["new", "moon"]
+        elif lunation_fraction < 0.25:
+            return ["waxing", "crescent"]
+        elif lunation_fraction == 0.25:
+            return ["first", "quarter"]
+        elif lunation_fraction < 0.5:
+            return ["waxing", "gibbous"]
+        elif lunation_fraction == 0.5:
+            return ["full", "moon"]
+        elif lunation_fraction < 0.75:
+            return ["waning", "gibbous"]
+        elif lunation_fraction == 0.75:
+            return ["last", "quarter"]
+        elif lunation_fraction > 0.75:
+            return ["waning", "crescent"]
+
     def format_long_date(self, datetime):
         dayofweek = "{:%A}".format(datetime)
         month = "{:%B}".format(datetime)
@@ -401,8 +422,8 @@ class Weather:
         self.display_shared_currently_today(today)
         label = "Moon Phase:"
         if 'moonPhase' in today:
-            moon_phase = today['moonPhase']
-            print(self.format_datapoint(label, moon_phase, Weather.us_units['moonPhase']))
+            moon_phase = self.calculate_moon_phase(today['moonPhase'])
+            print(self.format_datapoint(label, moon_phase[0], moon_phase[1]))
         else:
             print(self.format_datapoint(label))
 
