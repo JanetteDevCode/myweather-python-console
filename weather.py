@@ -280,9 +280,9 @@ class Weather:
         print("==================={0}".format('=' * len(self.__zip_code)))
         print()
 
-        for i, alert in enumerate(alerts, start=1):
+        for alert_number, alert in enumerate(alerts, start=1):
             print('*' * 80)
-            print("Alert #{0}".format(i))
+            print("Alert #{0}".format(alert_number))
             print()
             print(alert['severity'].upper(), end=': ')
             print(alert['title'])
@@ -298,8 +298,8 @@ class Weather:
             print("Regions affected:", end=' ')
             alert_regions = alert['regions']
             alert_regions_count = len(alert_regions)
-            for i, region in enumerate(alert_regions, start=1):
-                if i == alert_regions_count:
+            for region_number, region in enumerate(alert_regions, start=1):
+                if region_number == alert_regions_count:
                     print(region)
                 else:
                     print(region, end=', ')
@@ -308,7 +308,7 @@ class Weather:
             print(alert['description'])
             print("Additional Info: {0}".format(alert['uri']))
             print('*' * 80)
-            if i < len(alerts):
+            if alert_number < len(alerts):
                 print()
                 input("--- Press 'Enter' to display the next alert. --- ")
                 print()
