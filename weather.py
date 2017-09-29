@@ -171,6 +171,11 @@ class Weather:
             .format(month=month, dayofmonth=dayofmonth))
         return {'dayofweek': dayofweek, 'month_dayofmonth': month_dayofmonth}
 
+    def format_short_time(self, datetime):
+        hour = "{:%I}".format(datetime).lstrip('0')
+        ampm = "{:%p}".format(datetime)
+        return {'hour': hour, 'ampm': ampm}
+
     def format_datapoint(self, label, value='n/a', unit=' '):
         return ("{0:<18} {1:>10} {2:<10}".format(label, value, unit))
 
@@ -372,7 +377,51 @@ class Weather:
         print("==================={0}".format('=' * len(self.__zip_code)))
         print()
 
-        self.display_datablock_array(timezone, hourly)
+        # self.display_datablock_array(timezone, hourly)
+
+        max_hours = min(len(hourly), 24)
+
+        for i in range(0, max_hours):
+            hour = hourly[i]
+            hour_datetime = datetime.fromtimestamp(hour['time'], timezone)
+            hour_date = self.format_short_date(hour_datetime)
+            hour_time = self.format_short_time(hour_datetime)
+
+            # Summary block
+            # --------------------------------------------------------------------------------
+            #     Day of Week    Time                                     Chance of Precip
+            #     Month Day      Temp                                              Summary
+            # --------------------------------------------------------------------------------
+            print('-' * 80)
+            # row 1
+            print("    {0:<10}".format(hour_date['dayofweek']), end='')
+            print("{0:>3} {1:<6}".format(hour_time['hour'], hour_time['ampm']), end='')
+            if 'precipProbability' in hour:
+                precip_probability = round(hour['precipProbability'] * 100)
+                if 'precipType' in hour:
+                    precip_type = hour['precipType'].title()
+                else:
+                    precip_type = "Rain"
+                precip = ("{0} {1} Chance of {2}"
+                    .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
+                print("{0:>52}    ".format(precip))
+            # row 2
+            print("    {0:<10}".format(hour_date['month_dayofmonth']), end='')
+            if 'temperature' in hour:
+                temperature = round(hour['temperature'])
+                print("{0:>3} {1:<6}".format(
+                    temperature, Weather.us_units['temperature']), end='')
+            if 'summary' in hour:
+                summary = hour['summary']
+                print("{0:>52}    ".format(summary))
+
+            pause = 4
+            if (i + 1) % pause == 0 and (i + 1) < max_hours:
+                print('-' * 80)
+                print()
+                input("--- Press 'Enter' to display more hours. --- ")
+                print()
+        print('-' * 80)
 
     def display_daily(self, timezone, daily=[]):
         print()
@@ -395,13 +444,6 @@ class Weather:
             #     Day of Week    High Temp                                Chance of Precip
             #     Month Day      Low Temp                                          Summary
             # --------------------------------------------------------------------------------
-            pause = 5
-            if (i + 1) % pause == 0 and (i + 1) < max_days:
-                print('-' * 80)
-                print()
-                input("--- Press 'Enter' to display more days. --- ")
-                print()
-
             print('-' * 80)
             # row 1
             print("    {0:<10}".format(day_date['dayofweek']), end='')
@@ -427,6 +469,13 @@ class Weather:
             if 'summary' in day:
                 summary = day['summary']
                 print("{0:>47}    ".format(summary))
+
+            pause = 4
+            if (i + 1) % pause == 0 and (i + 1) < max_days:
+                print('-' * 80)
+                print()
+                input("--- Press 'Enter' to display more days. --- ")
+                print()
         print('-' * 80)
 
     def display_today(self, timezone, today={}):
