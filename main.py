@@ -113,14 +113,15 @@ if geocode_json['status'] != 'OK' or 'error' in geocode_json:
     print("Error! Could not retrieve geocode data.")
     sys.exit()
 else:
+    location = geocode_json['results'][0]['formatted_address'].rstrip(', USA')
     latitude = geocode_json['results'][0]['geometry']['location']['lat']
     longitude = geocode_json['results'][0]['geometry']['location']['lng']
     print()
-    print("ZIP Code: {0}".format(zip_code))
+    print("Location: {0}".format(location))
     print("Latitude: {0}, Longitude: {1}".format(latitude, longitude))
     print()
 
-weather = Weather(zip_code, latitude, longitude)
+weather = Weather(location, latitude, longitude)
 
 while True:
     display_weather_choice_menu()

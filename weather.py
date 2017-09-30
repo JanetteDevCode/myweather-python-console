@@ -2,8 +2,8 @@ from weather_api_request import WeatherApiRequest
 
 
 class Weather:
-    def __init__(self, zip_code, latitude, longitude):
-        self.__zip_code = zip_code
+    def __init__(self, location, latitude, longitude):
+        self.__location = location
         self.__latitude = latitude
         self.__longitude = longitude
 
@@ -22,7 +22,7 @@ class Weather:
             results['status'] = 'ERROR'
             results['error_message'] = ("Error! Could not retrieve weather alerts.")
         else:
-            results['location'] = self.__zip_code
+            results['location'] = self.__location
             results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
@@ -49,7 +49,7 @@ class Weather:
             results['status'] = 'ERROR'
             results['error_message'] = ("Error! Could not retrieve current weather data.")
         else:
-            results['location'] = self.__zip_code
+            results['location'] = self.__location
             results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
@@ -79,7 +79,7 @@ class Weather:
             results['status'] = 'ERROR'
             results['error_message'] = ("Error! Could not retrieve hourly weather data.")
         else:
-            results['location'] = self.__zip_code
+            results['location'] = self.__location
             results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
@@ -109,7 +109,7 @@ class Weather:
             results['status'] = 'ERROR'
             results['error_message'] = ("Error! Could not retrieve daily weather data.")
         else:
-            results['location'] = self.__zip_code
+            results['location'] = self.__location
             results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
@@ -139,7 +139,7 @@ class Weather:
             results['status'] = 'ERROR'
             results['error_message'] = ("Error! Could not retrieve today's weather data.")
         else:
-            results['location'] = self.__zip_code
+            results['location'] = self.__location
             results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
