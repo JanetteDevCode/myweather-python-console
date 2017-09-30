@@ -2,6 +2,7 @@ import re
 import weather_units
 from datetime import datetime
 
+
 def format_long_date(datetime):
     dayofweek = "{:%A}".format(datetime)
     month = "{:%B}".format(datetime)
@@ -147,15 +148,15 @@ def display_alerts(location, timezone, alerts=[]):
         print(alert['severity'].upper(), end=': ')
         print(alert['title'])
         alert_time = datetime.fromtimestamp(alert['time'], timezone)
-        print("Effective at: {date} {time}"
+        print("Effective: {date} {time}"
             .format(date=format_long_date(alert_time),
                 time=format_long_time(alert_time)))
         alert_expires = datetime.fromtimestamp(alert['expires'], timezone)
-        print("Expires at: {date} {time}"
+        print("Expires: {date} {time}"
             .format(date=format_long_date(alert_expires),
                 time=format_long_time(alert_expires)))
         print()
-        print("Regions affected:", end=' ')
+        print("Regions Affected:", end=' ')
         alert_regions = alert['regions']
         alert_regions_count = len(alert_regions)
         for region_number, region in enumerate(alert_regions, start=1):

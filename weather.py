@@ -1,12 +1,9 @@
-import math, re
 import weather_console
-from datetime import datetime
 from pytz import timezone
 from weather_api_request import WeatherApiRequest
 
 
 class Weather:
-
     def __init__(self, zip_code, latitude, longitude):
         self.__zip_code = zip_code
         self.__latitude = latitude

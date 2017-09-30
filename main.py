@@ -3,6 +3,7 @@ from geocode_api_request import GeocodeApiRequest
 from weather_api_request import WeatherApiRequest
 from weather import Weather
 
+
 weather_choices = {
     'currently': {'id': 'C', 'description': "Current conditions"},
     'hourly': {'id': 'H', 'description': "Hourly forecast"},
