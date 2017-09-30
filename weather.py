@@ -90,7 +90,7 @@ class Weather:
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            print("Error! Could not retrieve daily weather data.")
+            print("Error! Could not retrieve today's weather data.")
         else:
             weather_timezone = timezone(weather_json['timezone'])
 
