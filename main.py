@@ -25,29 +25,37 @@ def display_weather_choice_menu():
     print()
 
 def process_weather_choice(choice=''):
+    status = {}
     choice = choice.strip()
+
     print()
+
     if choice == 'Q':
         print("Goodbye.")
         return False
     elif choice == weather_choices['currently']['id']:
-        weather.get_current_weather()
+        status = weather.get_current_weather()
         # print(weather_choices['currently']['description'])
     elif choice == weather_choices['hourly']['id']:
-        weather.get_hourly_weather()
+        status = weather.get_hourly_weather()
         # print(weather_choices['hourly']['description'])
     elif choice == weather_choices['today']['id']:
-        weather.get_today_weather()
+        status = weather.get_today_weather()
         # print(weather_choices['today']['description'])
     elif choice == weather_choices['daily']['id']:
-        weather.get_daily_weather()
+        status = weather.get_daily_weather()
         # print(weather_choices['daily']['description'])
     elif choice == weather_choices['alerts']['id']:
-        weather.get_weather_alerts()
+        status = weather.get_weather_alerts()
         # print(weather_choices['alerts']['description'])
     else:
         print("Invalid selection.")
+
+    if 'status' in status and status['status'] == 'ERROR':
+        print(status['error_message'])
+        
     print()
+
     return True
 
 #    __  __        __          __        _   _
