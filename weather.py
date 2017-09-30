@@ -277,9 +277,9 @@ class Weather:
         else:
             print("!!! There are {0} weather alerts for your location. !!!"
                 .format(alerts_count))
+        print()
 
     def display_alerts(self, timezone, alerts=[]):
-        print()
         print("==================={0}".format('=' * len(self.__zip_code)))
         print("Weather Alerts for {0}".format(self.__zip_code))
         print("==================={0}".format('=' * len(self.__zip_code)))
@@ -319,7 +319,6 @@ class Weather:
                 print()
 
     def display_currently(self, timezone, currently={}):
-        print()
         print("===================={0}".format('=' * len(self.__zip_code)))
         print("Current Weather for {0}".format(self.__zip_code))
         print("===================={0}".format('=' * len(self.__zip_code)))
@@ -334,14 +333,14 @@ class Weather:
 
         # Summary block
         # --------------------------------------------------------------------------------
-        #     Temp                       Summary                      Chance of Precip
+        #     100 °F                Mostly Cloudy                100 % Chance of Sleet
         # --------------------------------------------------------------------------------
         print('-' * 80)
         if 'temperature' in currently:
             temperature = round(currently['temperature'])
             print("    {0:>3} {1:<16}".format(temperature, Weather.us_units['temperature']), end='')
         if 'summary' in currently:
-            summary = currently['summary']
+            summary = currently['summary'].rstrip('.')
             print("{0:^26}".format(summary), end='')
         if 'precipProbability' in currently:
             precip_probability = round(currently['precipProbability'] * 100)
@@ -368,10 +367,8 @@ class Weather:
             print(self.format_datapoint(label, nearest_storm, Weather.us_units['nearestStormDistance']))
         else:
             print(self.format_datapoint(label))
-        print()
 
     def display_hourly(self, timezone, hourly=[]):
-        print()
         print("==================={0}".format('=' * len(self.__zip_code)))
         print("Hourly Weather for {0}".format(self.__zip_code))
         print("==================={0}".format('=' * len(self.__zip_code)))
@@ -389,13 +386,16 @@ class Weather:
 
             # Summary block
             # --------------------------------------------------------------------------------
-            #     Day of Week    Time                                     Chance of Precip
-            #     Month Day      Temp                                              Summary
+            #     Sat Sep 30                 100 °F                  100 % Chance of Sleet
+            #     12 PM                                                      Mostly Cloudy
             # --------------------------------------------------------------------------------
             print('-' * 80)
             # row 1
-            print("    {0:<10}".format(hour_date['dayofweek']), end='')
-            print("{0:>3} {1:<6}".format(hour_time['hour'], hour_time['ampm']), end='')
+            print("    {0:>3} {1:<23}".format(hour_date['dayofweek'], hour_date['month_dayofmonth']), end='')
+            if 'temperature' in hour:
+                temperature = round(hour['temperature'])
+                print("{0:>3} {1:<2}".format(
+                    temperature, Weather.us_units['temperature']), end='')
             if 'precipProbability' in hour:
                 precip_probability = round(hour['precipProbability'] * 100)
                 if 'precipType' in hour:
@@ -404,16 +404,12 @@ class Weather:
                     precip_type = "Rain"
                 precip = ("{0} {1} Chance of {2}"
                     .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
-                print("{0:>52}    ".format(precip))
+                print("{0:>39}    ".format(precip))
             # row 2
-            print("    {0:<10}".format(hour_date['month_dayofmonth']), end='')
-            if 'temperature' in hour:
-                temperature = round(hour['temperature'])
-                print("{0:>3} {1:<6}".format(
-                    temperature, Weather.us_units['temperature']), end='')
+            print("    {0:>2} {1:<7}".format(hour_time['hour'], hour_time['ampm']), end='')
             if 'summary' in hour:
-                summary = hour['summary']
-                print("{0:>52}    ".format(summary))
+                summary = hour['summary'].rstrip('.')
+                print("{0:>62}    ".format(summary))
 
             pause = 4
             if (i + 1) % pause == 0 and (i + 1) < max_hours:
@@ -424,7 +420,6 @@ class Weather:
         print('-' * 80)
 
     def display_daily(self, timezone, daily=[]):
-        print()
         print("=================={0}".format('=' * len(self.__zip_code)))
         print("Daily Weather for {0}".format(self.__zip_code))
         print("=================={0}".format('=' * len(self.__zip_code)))
@@ -441,16 +436,19 @@ class Weather:
 
             # Summary block
             # --------------------------------------------------------------------------------
-            #     Day of Week    High Temp                                Chance of Precip
-            #     Month Day      Low Temp                                          Summary
+            #     Tue Oct 13        100 °F High / -10 °F Low         100 % Chance of Sleet
+            #                  Breezy until afternoon and mostly cloudy throughout the day
             # --------------------------------------------------------------------------------
             print('-' * 80)
             # row 1
-            print("    {0:<10}".format(day_date['dayofweek']), end='')
-            if 'temperatureHigh' in day:
+            print("    {0:>3} {1:<14}".format(day_date['dayofweek'], day_date['month_dayofmonth']), end='')
+            if ('temperatureHigh' in day) and ('temperatureLow' in day):
                 temperature_high = round(day['temperatureHigh'])
-                print("{0:>3} {1:<2} {2:<8}".format(
-                    temperature_high, Weather.us_units['temperatureHigh'], "High"), end='')
+                temperature_low = round(day['temperatureLow'])
+                print("{0:>3} {1:<2} High / {2:>3} {3:<2} Low"
+                    .format(
+                        temperature_high, Weather.us_units['temperatureHigh'],
+                        temperature_low, Weather.us_units['temperatureLow']), end='')
             if 'precipProbability' in day:
                 precip_probability = round(day['precipProbability'] * 100)
                 if 'precipType' in day:
@@ -459,16 +457,11 @@ class Weather:
                     precip_type = "Rain"
                 precip = ("{0} {1} Chance of {2}"
                     .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
-                print("{0:>47}    ".format(precip))
+                print("{0:>30}    ".format(precip))
             # row 2
-            print("    {0:<10}".format(day_date['month_dayofmonth']), end='')
-            if 'temperatureLow' in day:
-                temperature_low = round(day['temperatureLow'])
-                print("{0:>3} {1:<2} {2:<8}".format(
-                    temperature_low, Weather.us_units['temperatureLow'], "Low"), end='')
             if 'summary' in day:
-                summary = day['summary']
-                print("{0:>47}    ".format(summary))
+                summary = day['summary'].rstrip('.')
+                print("    {0:>72}    ".format(summary))
 
             pause = 4
             if (i + 1) % pause == 0 and (i + 1) < max_days:
@@ -479,7 +472,6 @@ class Weather:
         print('-' * 80)
 
     def display_today(self, timezone, today={}):
-        print()
         print("===================={0}".format('=' * len(self.__zip_code)))
         print("Today's Weather for {0}".format(self.__zip_code))
         print("===================={0}".format('=' * len(self.__zip_code)))
@@ -493,15 +485,18 @@ class Weather:
 
         # Summary block
         # --------------------------------------------------------------------------------
-        #     High Temp                                               Chance of Precip
-        #     Low Temp                                                         Summary
+        #     100 °F High / -10 °F Low                           100 % Chance of Sleet
+        #                  Breezy until afternoon and mostly cloudy throughout the day
         # --------------------------------------------------------------------------------
         print('-' * 80)
         # row 1
-        if 'temperatureHigh' in today:
+        if ('temperatureHigh' in today) and ('temperatureLow' in today):
             temperature_high = round(today['temperatureHigh'])
-            print("    {0:>3} {1:<2} {2:<8}".format(
-                temperature_high, Weather.us_units['temperatureHigh'], "High"), end='')
+            temperature_low = round(today['temperatureLow'])
+            print("    {0:>3} {1:<2} High / {2:>3} {3:<2} Low"
+                .format(
+                    temperature_high, Weather.us_units['temperatureHigh'],
+                    temperature_low, Weather.us_units['temperatureLow']), end='')
         if 'precipProbability' in today:
             precip_probability = round(today['precipProbability'] * 100)
             if 'precipType' in today:
@@ -510,15 +505,11 @@ class Weather:
                 precip_type = "Rain"
             precip = ("{0} {1} Chance of {2}"
                 .format(precip_probability, Weather.us_units['precipProbability'], precip_type))
-            print("{0:>57}    ".format(precip))
+            print("{0:>48}    ".format(precip))
         # row 2
-        if 'temperatureLow' in today:
-            temperature_low = round(today['temperatureLow'])
-            print("    {0:>3} {1:<2} {2:<8}".format(
-                temperature_low, Weather.us_units['temperatureLow'], "Low"), end='')
         if 'summary' in today:
-            summary = today['summary']
-            print("{0:>57}    ".format(summary))
+            summary = today['summary'].rstrip('.')
+            print("    {0:>72}    ".format(summary))
         print('-' * 80)
 
         # Details block
@@ -544,4 +535,3 @@ class Weather:
             print(self.format_datapoint(label, sunset_time['hour_minutes'], sunset_time['ampm']))
         else:
             print(self.format_datapoint(label))
-        print()
