@@ -1,3 +1,4 @@
+import weather_console
 import sys
 from geocode_api_request import GeocodeApiRequest
 from weather_api_request import WeatherApiRequest
@@ -25,7 +26,7 @@ def display_weather_choice_menu():
     print()
 
 def process_weather_choice(choice=''):
-    status = {}
+    results = {}
     choice = choice.strip()
 
     print()
@@ -34,26 +35,45 @@ def process_weather_choice(choice=''):
         print("Goodbye.")
         return False
     elif choice == weather_choices['currently']['id']:
-        status = weather.get_current_weather()
+        results = weather.get_current_weather()
+        if results['status'] == 'OK':
+            weather_console.display_alerts_count(results['alerts'])
+            weather_console.display_currently(
+                results['location'], results['timezone'], results['currently'])
         # print(weather_choices['currently']['description'])
     elif choice == weather_choices['hourly']['id']:
-        status = weather.get_hourly_weather()
+        results = weather.get_hourly_weather()
+        if results['status'] == 'OK':
+            weather_console.display_alerts_count(results['alerts'])
+            weather_console.display_hourly(
+                results['location'], results['timezone'], results['hourly'])
         # print(weather_choices['hourly']['description'])
     elif choice == weather_choices['today']['id']:
-        status = weather.get_today_weather()
+        results = weather.get_today_weather()
+        if results['status'] == 'OK':
+            weather_console.display_alerts_count(results['alerts'])
+            weather_console.display_today(
+                results['location'], results['timezone'], results['today'])
         # print(weather_choices['today']['description'])
     elif choice == weather_choices['daily']['id']:
-        status = weather.get_daily_weather()
+        results = weather.get_daily_weather()
+        if results['status'] == 'OK':
+            weather_console.display_alerts_count(results['alerts'])
+            weather_console.display_daily(
+                results['location'], results['timezone'], results['daily'])
         # print(weather_choices['daily']['description'])
     elif choice == weather_choices['alerts']['id']:
-        status = weather.get_weather_alerts()
+        results = weather.get_weather_alerts()
+        if results['status'] == 'OK':
+            weather_console.display_alerts(
+                results['location'], results['timezone'], results['alerts'])
         # print(weather_choices['alerts']['description'])
     else:
         print("Invalid selection.")
 
-    if 'status' in status and status['status'] == 'ERROR':
-        print(status['error_message'])
-        
+    if results['status'] == 'ERROR':
+        print(results['error_message'])
+
     print()
 
     return True

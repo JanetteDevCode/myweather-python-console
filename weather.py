@@ -1,5 +1,3 @@
-import weather_console
-from pytz import timezone
 from weather_api_request import WeatherApiRequest
 
 
@@ -10,101 +8,147 @@ class Weather:
         self.__longitude = longitude
 
     def get_weather_alerts(self):
-        status = {'status': 'OK', 'error_message': ''}
+        results = {
+            'status': 'OK',
+            'error_message': '',
+            'location': '',
+            'timezone': '',
+            'alerts': []
+        }
         weather_json = WeatherApiRequest.get_weather_alerts(
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            error_message = ("Error! Could not retrieve weather alerts.")
-            status = {'status': 'ERROR', 'error_message': error_message}
+            results['status'] = 'ERROR'
+            results['error_message'] = ("Error! Could not retrieve weather alerts.")
         else:
-            weather_timezone = timezone(weather_json['timezone'])
+            results['location'] = self.__zip_code
+            results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
-                weather_console.display_alerts(
-                    self.__zip_code, weather_timezone, weather_json['alerts'])
+                results['alerts'] = weather_json['alerts']
             else:
-                error_message = ("There are no weather alerts for your location.")
-                status = {'status': 'ERROR', 'error_message': error_message}
+                results['status'] = 'ERROR'
+                results['error_message'] = ("There are no weather alerts for your location.")
 
-        return status
+        return results
 
     def get_current_weather(self):
-        status = {'status': 'OK', 'error_message': ''}
+        results = {
+            'status': 'OK',
+            'error_message': '',
+            'location': '',
+            'timezone': '',
+            'alerts': [],
+            'currently': {}
+        }
         weather_json = WeatherApiRequest.get_current_weather_json(
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            error_message = ("Error! Could not retrieve current weather data.")
-            status = {'status': 'ERROR', 'error_message': error_message}
+            results['status'] = 'ERROR'
+            results['error_message'] = ("Error! Could not retrieve current weather data.")
         else:
-            weather_timezone = timezone(weather_json['timezone'])
+            results['location'] = self.__zip_code
+            results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
-                weather_console.display_alerts_count(weather_json['alerts'])
+                results['alerts'] = weather_json['alerts']
 
             if 'currently' in weather_json:
-                weather_console.display_currently(
-                    self.__zip_code, weather_timezone, weather_json['currently'])
+                results['currently'] = weather_json['currently']
+            else:
+                results['status'] = 'ERROR'
+                results['error_message'] = ("There are no current weather data for your location.")
 
-        return status
+        return results
 
     def get_hourly_weather(self):
-        status = {'status': 'OK', 'error_message': ''}
+        results = {
+            'status': 'OK',
+            'error_message': '',
+            'location': '',
+            'timezone': '',
+            'alerts': [],
+            'hourly': []
+        }
         weather_json = WeatherApiRequest.get_hourly_weather_json(
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            error_message = ("Error! Could not retrieve hourly weather data.")
-            status = {'status': 'ERROR', 'error_message': error_message}
+            results['status'] = 'ERROR'
+            results['error_message'] = ("Error! Could not retrieve hourly weather data.")
         else:
-            weather_timezone = timezone(weather_json['timezone'])
+            results['location'] = self.__zip_code
+            results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
-                weather_console.display_alerts_count(weather_json['alerts'])
+                results['alerts'] = weather_json['alerts']
 
             if 'hourly' in weather_json:
-                weather_console.display_hourly(
-                    self.__zip_code, weather_timezone, weather_json['hourly']['data'])
+                results['hourly'] = weather_json['hourly']['data']
+            else:
+                results['status'] = 'ERROR'
+                results['error_message'] = ("There are no hourly weather data for your location.")
 
-        return status
+        return results
 
     def get_daily_weather(self):
-        status = {'status': 'OK', 'error_message': ''}
+        results = {
+            'status': 'OK',
+            'error_message': '',
+            'location': '',
+            'timezone': '',
+            'alerts': [],
+            'daily': []
+        }
         weather_json = WeatherApiRequest.get_daily_weather_json(
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            error_message = ("Error! Could not retrieve daily weather data.")
-            status = {'status': 'ERROR', 'error_message': error_message}
+            results['status'] = 'ERROR'
+            results['error_message'] = ("Error! Could not retrieve daily weather data.")
         else:
-            weather_timezone = timezone(weather_json['timezone'])
+            results['location'] = self.__zip_code
+            results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
-                weather_console.display_alerts_count(weather_json['alerts'])
+                results['alerts'] = weather_json['alerts']
 
             if 'daily' in weather_json:
-                weather_console.display_daily(
-                    self.__zip_code, weather_timezone, weather_json['daily']['data'])
+                results['daily'] = weather_json['daily']['data']
+            else:
+                results['status'] = 'ERROR'
+                results['error_message'] = ("There are no daily weather data for your location.")
 
-        return status
+        return results
 
     def get_today_weather(self):
-        status = {'status': 'OK', 'error_message': ''}
+        results = {
+            'status': 'OK',
+            'error_message': '',
+            'location': '',
+            'timezone': '',
+            'alerts': [],
+            'today': {}
+        }
         weather_json = WeatherApiRequest.get_daily_weather_json(
             self.__latitude, self.__longitude)
 
         if 'error' in weather_json:
-            error_message = ("Error! Could not retrieve today's weather data.")
-            status = {'status': 'ERROR', 'error_message': error_message}
+            results['status'] = 'ERROR'
+            results['error_message'] = ("Error! Could not retrieve today's weather data.")
         else:
-            weather_timezone = timezone(weather_json['timezone'])
+            results['location'] = self.__zip_code
+            results['timezone'] = weather_json['timezone']
 
             if 'alerts' in weather_json:
-                weather_console.display_alerts_count(weather_json['alerts'])
+                results['alerts'] = weather_json['alerts']
 
             if 'daily' in weather_json:
-                weather_console.display_today(
-                    self.__zip_code, weather_timezone, weather_json['daily']['data'][0])
+                results['today'] = weather_json['daily']['data'][0]
+            else:
+                results['status'] = 'ERROR'
+                results['error_message'] = ("There are no today's weather data for your location.")
 
-        return status
+        return results

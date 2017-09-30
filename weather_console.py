@@ -1,4 +1,5 @@
 import re
+import pytz
 import weather_units
 from datetime import datetime
 
@@ -49,7 +50,7 @@ def display_datablock(timezone, datablock={}):
         label = re.findall('[A-Z][^A-Z]*', label)
         label = ' '.join(label) + ':'
         if 'Time' in label:
-            datablock_time = datetime.fromtimestamp(v, timezone)
+            datablock_time = datetime.fromtimestamp(v, pytz.timezone(timezone))
             formatted_datablock_time = "{:%Y-%m-%d %I:%M:%S %p %Z}".format(datablock_time)
             print("{0:<30} {1:>30}".format(label, formatted_datablock_time))
         else:
@@ -59,7 +60,7 @@ def display_datablock(timezone, datablock={}):
 def display_datablock_array(timezone, datablock_array=[]):
     # for datablock in datablock_array:
     #     print('*' * 80)
-    #     self.display_datablock(timezone, datablock)
+    #     self.display_datablock(pytz_timezone, datablock)
     for i in range(0, 3):
         print('*' * 80)
         display_datablock(timezone, datablock_array[i])
@@ -127,7 +128,7 @@ def display_alerts_count(alerts=[]):
     alerts_count = len(alerts)
 
     if alerts_count == 0:
-        print("There are no weather alerts for your location.")
+        return
     elif alerts_count == 1:
         print("!!! There is 1 weather alert for your location. !!!")
     else:
@@ -141,17 +142,19 @@ def display_alerts(location, timezone, alerts=[]):
     print("==================={0}".format('=' * len(location)))
     print()
 
+    alert_timezone = pytz.timezone(timezone)
+
     for alert_number, alert in enumerate(alerts, start=1):
         print('*' * 80)
         print("Alert #{0}".format(alert_number))
         print()
         print(alert['severity'].upper(), end=': ')
         print(alert['title'])
-        alert_time = datetime.fromtimestamp(alert['time'], timezone)
+        alert_time = datetime.fromtimestamp(alert['time'], alert_timezone)
         print("Effective: {date} {time}"
             .format(date=format_long_date(alert_time),
                 time=format_long_time(alert_time)))
-        alert_expires = datetime.fromtimestamp(alert['expires'], timezone)
+        alert_expires = datetime.fromtimestamp(alert['expires'], alert_timezone)
         print("Expires: {date} {time}"
             .format(date=format_long_date(alert_expires),
                 time=format_long_time(alert_expires)))
@@ -182,7 +185,8 @@ def display_currently(location, timezone, currently={}):
 
     # display_datablock(timezone, currently)
 
-    currently_datetime = datetime.fromtimestamp(currently['time'], timezone)
+    currently_timezone = pytz.timezone(timezone)
+    currently_datetime = datetime.fromtimestamp(currently['time'], currently_timezone)
 
     print("{0:<60}{1:>20}".format(format_long_date(currently_datetime),
                 format_long_time(currently_datetime)))
@@ -232,11 +236,12 @@ def display_hourly(location, timezone, hourly=[]):
 
     # display_datablock_array(timezone, hourly)
 
+    hourly_timezone = pytz.timezone(timezone)
     max_hours = min(len(hourly), 24)
 
     for i in range(0, max_hours):
         hour = hourly[i]
-        hour_datetime = datetime.fromtimestamp(hour['time'], timezone)
+        hour_datetime = datetime.fromtimestamp(hour['time'], hourly_timezone)
         hour_date = format_short_date(hour_datetime)
         hour_time = format_short_time(hour_datetime)
 
@@ -283,11 +288,12 @@ def display_daily(location, timezone, daily=[]):
 
     # display_datablock_array(timezone, daily)
 
+    daily_timezone = pytz.timezone(timezone)
     max_days = len(daily)
 
     for i in range(0, max_days):
         day = daily[i]
-        day_datetime = datetime.fromtimestamp(day['time'], timezone)
+        day_datetime = datetime.fromtimestamp(day['time'], daily_timezone)
         day_date = format_short_date(day_datetime)
 
         # Summary block
@@ -335,7 +341,8 @@ def display_today(location, timezone, today={}):
 
     # display_datablock(timezone, today)
 
-    today_datetime = datetime.fromtimestamp(today['time'], timezone)
+    today_timezone = pytz.timezone(timezone)
+    today_datetime = datetime.fromtimestamp(today['time'], today_timezone)
 
     print("{0:<60}".format(format_long_date(today_datetime)))
 
@@ -379,14 +386,14 @@ def display_today(location, timezone, today={}):
 
     label = "Sunrise:"
     if 'sunriseTime' in today:
-        sunrise_datetime = datetime.fromtimestamp(today['sunriseTime'], timezone)
+        sunrise_datetime = datetime.fromtimestamp(today['sunriseTime'], today_timezone)
         sunrise_time = format_datapoint_time(sunrise_datetime)
         print(format_datapoint(label, sunrise_time['hour_minutes'], sunrise_time['ampm']), end='')
     else:
         print(format_datapoint(label), end='')
     label = "Sunset:"
     if 'sunsetTime' in today:
-        sunset_datetime = datetime.fromtimestamp(today['sunsetTime'], timezone)
+        sunset_datetime = datetime.fromtimestamp(today['sunsetTime'], today_timezone)
         sunset_time = format_datapoint_time(sunset_datetime)
         print(format_datapoint(label, sunset_time['hour_minutes'], sunset_time['ampm']))
     else:
