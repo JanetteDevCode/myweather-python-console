@@ -1,8 +1,9 @@
+import os
 from api_request import ApiRequest
 
 
 class WeatherApiRequest:
-    darksky_api_key = '7f560844e81c036d5e8beafb449eda24'
+    darksky_api_key = os.environ['DARKSKY_API_KEY']
 
     @classmethod
     def get_darksky_uri(cls, latitude, longitude):

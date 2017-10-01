@@ -1,8 +1,9 @@
+import os
 from api_request import ApiRequest
 
 
 class GeocodeApiRequest:
-    googlemapsgeocoding_api_key = 'AIzaSyBO5h570rjeDP9Cz8KkCeAFwX-NHu0fLkQ'
+    googlemapsgeocoding_api_key = os.environ['GOOGLEMAPS_GEOCODING_API_KEY']
 
     @classmethod
     def get_googlemapsgeocoding_uri(cls):
