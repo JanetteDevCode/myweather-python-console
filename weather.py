@@ -9,8 +9,8 @@ class Weather:
 
     def get_weather_alerts(self):
         results = {
-            'status': 'OK',
-            'error_message': '',
+            'status': '',
+            'error': '',
             'location': '',
             'timezone': '',
             'alerts': []
@@ -20,23 +20,24 @@ class Weather:
 
         if 'error' in weather_json:
             results['status'] = 'ERROR'
-            results['error_message'] = ("Error! Could not retrieve weather alerts.")
+            results['error'] = ("Error! Could not retrieve weather alerts.")
+            results['error'] += ("\n" + weather_json['error'])
         else:
-            results['location'] = self.__location
-            results['timezone'] = weather_json['timezone']
-
             if 'alerts' in weather_json:
+                results['status'] = 'OK'
                 results['alerts'] = weather_json['alerts']
+                results['location'] = self.__location
+                results['timezone'] = weather_json['timezone']
             else:
                 results['status'] = 'ERROR'
-                results['error_message'] = ("There are no weather alerts for your location.")
+                results['error'] = ("There are no weather alerts for your location.")
 
         return results
 
     def get_current_weather(self):
         results = {
-            'status': 'OK',
-            'error_message': '',
+            'status': '',
+            'error': '',
             'location': '',
             'timezone': '',
             'alerts': [],
@@ -47,26 +48,26 @@ class Weather:
 
         if 'error' in weather_json:
             results['status'] = 'ERROR'
-            results['error_message'] = ("Error! Could not retrieve current weather data.")
+            results['error'] = ("Error! Could not retrieve current weather data.")
+            results['error'] += ("\n" + weather_json['error'])
         else:
-            results['location'] = self.__location
-            results['timezone'] = weather_json['timezone']
-
-            if 'alerts' in weather_json:
-                results['alerts'] = weather_json['alerts']
-
             if 'currently' in weather_json:
+                results['status'] = 'OK'
                 results['currently'] = weather_json['currently']
+                results['location'] = self.__location
+                results['timezone'] = weather_json['timezone']
+                if 'alerts' in weather_json:
+                    results['alerts'] = weather_json['alerts']
             else:
                 results['status'] = 'ERROR'
-                results['error_message'] = ("There are no current weather data for your location.")
+                results['error'] = ("There are no current weather data for your location.")
 
         return results
 
     def get_hourly_weather(self):
         results = {
-            'status': 'OK',
-            'error_message': '',
+            'status': '',
+            'error': '',
             'location': '',
             'timezone': '',
             'alerts': [],
@@ -77,26 +78,26 @@ class Weather:
 
         if 'error' in weather_json:
             results['status'] = 'ERROR'
-            results['error_message'] = ("Error! Could not retrieve hourly weather data.")
+            results['error'] = ("Error! Could not retrieve hourly weather data.")
+            results['error'] += ("\n" + weather_json['error'])
         else:
-            results['location'] = self.__location
-            results['timezone'] = weather_json['timezone']
-
-            if 'alerts' in weather_json:
-                results['alerts'] = weather_json['alerts']
-
             if 'hourly' in weather_json:
+                results['status'] = 'OK'
                 results['hourly'] = weather_json['hourly']['data']
+                results['location'] = self.__location
+                results['timezone'] = weather_json['timezone']
+                if 'alerts' in weather_json:
+                    results['alerts'] = weather_json['alerts']
             else:
                 results['status'] = 'ERROR'
-                results['error_message'] = ("There are no hourly weather data for your location.")
+                results['error'] = ("There are no hourly weather data for your location.")
 
         return results
 
     def get_daily_weather(self):
         results = {
-            'status': 'OK',
-            'error_message': '',
+            'status': '',
+            'error': '',
             'location': '',
             'timezone': '',
             'alerts': [],
@@ -107,26 +108,26 @@ class Weather:
 
         if 'error' in weather_json:
             results['status'] = 'ERROR'
-            results['error_message'] = ("Error! Could not retrieve daily weather data.")
+            results['error'] = ("Error! Could not retrieve daily weather data.")
+            results['error'] += ("\n" + weather_json['error'])
         else:
-            results['location'] = self.__location
-            results['timezone'] = weather_json['timezone']
-
-            if 'alerts' in weather_json:
-                results['alerts'] = weather_json['alerts']
-
             if 'daily' in weather_json:
+                results['status'] = 'OK'
                 results['daily'] = weather_json['daily']['data']
+                results['location'] = self.__location
+                results['timezone'] = weather_json['timezone']
+                if 'alerts' in weather_json:
+                    results['alerts'] = weather_json['alerts']
             else:
                 results['status'] = 'ERROR'
-                results['error_message'] = ("There are no daily weather data for your location.")
+                results['error'] = ("There are no daily weather data for your location.")
 
         return results
 
     def get_today_weather(self):
         results = {
-            'status': 'OK',
-            'error_message': '',
+            'status': '',
+            'error': '',
             'location': '',
             'timezone': '',
             'alerts': [],
@@ -137,18 +138,18 @@ class Weather:
 
         if 'error' in weather_json:
             results['status'] = 'ERROR'
-            results['error_message'] = ("Error! Could not retrieve today's weather data.")
+            results['error'] = ("Error! Could not retrieve today's weather data.")
+            results['error'] += ("\n" + weather_json['error'])
         else:
-            results['location'] = self.__location
-            results['timezone'] = weather_json['timezone']
-
-            if 'alerts' in weather_json:
-                results['alerts'] = weather_json['alerts']
-
             if 'daily' in weather_json:
+                results['status'] = 'OK'
                 results['today'] = weather_json['daily']['data'][0]
+                results['location'] = self.__location
+                results['timezone'] = weather_json['timezone']
+                if 'alerts' in weather_json:
+                    results['alerts'] = weather_json['alerts']
             else:
                 results['status'] = 'ERROR'
-                results['error_message'] = ("There are no today's weather data for your location.")
+                results['error'] = ("There are no today's weather data for your location.")
 
         return results

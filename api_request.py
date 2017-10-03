@@ -9,4 +9,4 @@ class ApiRequest:
             # print(req.url)
             return req.json()
         except Exception as e:
-            return {'error': e}
+            return {'status': 'ERROR', 'error': str(e)}

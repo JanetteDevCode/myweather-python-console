@@ -3,7 +3,10 @@ from api_request import ApiRequest
 
 
 class GeocodeApiRequest:
-    googlemapsgeocoding_api_key = os.environ['GOOGLEMAPS_GEOCODING_API_KEY']
+    try:
+        api_key = os.environ['GOOGLEMAPS_GEOCODING_API_KEY']
+    except:
+        api_key = None
 
     @classmethod
     def get_googlemapsgeocoding_uri(cls):
@@ -11,8 +14,12 @@ class GeocodeApiRequest:
 
     @classmethod
     def get_geocode_json(cls, zip_code):
-        return ApiRequest.make_api_request(
-                cls.get_googlemapsgeocoding_uri(),
-                {'components': 'postal_code:' + zip_code,
-                'key': GeocodeApiRequest.googlemapsgeocoding_api_key}
-            )
+        if GeocodeApiRequest.api_key:
+            return ApiRequest.make_api_request(
+                    cls.get_googlemapsgeocoding_uri(),
+                    {'components': 'postal_code:' + zip_code,
+                    'key': GeocodeApiRequest.api_key}
+                )
+        else:
+            return {'status': 'ERROR',
+                'error': "An API key for the Google Maps Geocoding API is required."}
