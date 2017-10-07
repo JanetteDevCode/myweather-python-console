@@ -1,5 +1,4 @@
-import weather_console
-import sys
+import sys, weather_console
 from geocode_api_request import GeocodeApiRequest
 from weather_api_request import WeatherApiRequest
 from weather import Weather
@@ -25,7 +24,7 @@ def display_weather_choice_menu():
     print("'Q' - Quit")
     print()
 
-def process_weather_choice(choice=''):
+def process_weather_choice(weather, choice=''):
     results = {}
     choice = choice.strip()
 
@@ -78,6 +77,33 @@ def process_weather_choice(choice=''):
 
     return True
 
+def get_user_zip_code():
+    # TODO: Validate format
+    return input("Enter ZIP code: ")
+
+def get_geocode(zip_code):
+    results = {
+        'status': '',
+        'error': '',
+        'location': '',
+        'latitude': 0,
+        'longitude': 0
+    }
+    geocode_json = GeocodeApiRequest.get_geocode_json(zip_code)
+
+    if geocode_json['status'] != 'OK':
+        results['status'] = 'ERROR'
+        results['error'] = ("Error! Could not retrieve geocode data.")
+        if 'error' in geocode_json:
+            results['error'] += ("\n" + geocode_json['error'])
+    else:
+        results['status'] = 'OK'
+        results['location'] = geocode_json['results'][0]['formatted_address'].rstrip(', USA')
+        results['latitude'] = geocode_json['results'][0]['geometry']['location']['lat']
+        results['longitude'] = geocode_json['results'][0]['geometry']['location']['lng']
+
+    return results
+
 def api_keys_exist():
     if not (GeocodeApiRequest.api_key or WeatherApiRequest.api_key):
         print("Missing API keys for geocoding and weather APIs!")
@@ -127,30 +153,23 @@ print()
 if not api_keys_exist():
     sys.exit()
 
-zip_code = input("Enter ZIP code: ")
-geocode_json = GeocodeApiRequest.get_geocode_json(zip_code)
+geocode = get_geocode(get_user_zip_code())
 
-if geocode_json['status'] != 'OK':
-    print("Error! Could not retrieve geocode data.")
-    if 'error' in geocode_json:
-        print(geocode_json['error'])
-    sys.exit()
+if geocode['status'] == 'OK':
+    print()
+    print("Location: {0}".format(geocode['location']))
+    print("Latitude: {0}, Longitude: {1}".format(geocode['latitude'], geocode['longitude']))
+    print()
+
+    weather = Weather(geocode['location'], geocode['latitude'], geocode['longitude'])
+
+    while True:
+        display_weather_choice_menu()
+        choice = input("Enter weather report choice: ")
+        if not process_weather_choice(weather, choice):
+            break
+        else:
+            input("--- Press 'Enter' to continue. --- ")
+            print()
 else:
-    location = geocode_json['results'][0]['formatted_address'].rstrip(', USA')
-    latitude = geocode_json['results'][0]['geometry']['location']['lat']
-    longitude = geocode_json['results'][0]['geometry']['location']['lng']
-    print()
-    print("Location: {0}".format(location))
-    print("Latitude: {0}, Longitude: {1}".format(latitude, longitude))
-    print()
-
-weather = Weather(location, latitude, longitude)
-
-while True:
-    display_weather_choice_menu()
-    choice = input("Enter weather report choice: ")
-    if not process_weather_choice(choice):
-        break
-    else:
-        input("--- Press 'Enter' to continue. --- ")
-        print()
+    print(geocode['error'])
