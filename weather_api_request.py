@@ -15,8 +15,7 @@ class WeatherApiRequest:
             + str(latitude) + ',' + str(longitude))
 
     @classmethod
-    def get_weather_alerts(cls, latitude, longitude):
-        exclude = 'currently,minutely,hourly,daily,flags'
+    def make_weather_api_request(cls, latitude, longitude, exclude):
         if WeatherApiRequest.api_key:
             return ApiRequest.make_api_request(
                     cls.get_darksky_uri(WeatherApiRequest.api_key, latitude, longitude),
@@ -25,39 +24,23 @@ class WeatherApiRequest:
         else:
             return {'status': 'ERROR',
                 'error': "An API key for the Dark Sky API is required."}
+
+    @classmethod
+    def get_weather_alerts(cls, latitude, longitude):
+        exclude = 'currently,minutely,hourly,daily,flags'
+        return cls.make_weather_api_request(latitude, longitude, exclude)
 
     @classmethod
     def get_current_weather_json(cls, latitude, longitude):
         exclude = 'minutely,hourly,daily,flags'
-        if WeatherApiRequest.api_key:
-            return ApiRequest.make_api_request(
-                    cls.get_darksky_uri(WeatherApiRequest.api_key, latitude, longitude),
-                    {'exclude': exclude}
-                )
-        else:
-            return {'status': 'ERROR',
-                'error': "An API key for the Dark Sky API is required."}
+        return cls.make_weather_api_request(latitude, longitude, exclude)
 
     @classmethod
     def get_hourly_weather_json(cls, latitude, longitude):
         exclude = 'currently,minutely,daily,flags'
-        if WeatherApiRequest.api_key:
-            return ApiRequest.make_api_request(
-                    cls.get_darksky_uri(WeatherApiRequest.api_key, latitude, longitude),
-                    {'exclude': exclude}
-                )
-        else:
-            return {'status': 'ERROR',
-                'error': "An API key for the Dark Sky API is required."}
+        return cls.make_weather_api_request(latitude, longitude, exclude)
 
     @classmethod
     def get_daily_weather_json(cls, latitude, longitude):
         exclude = 'currently,minutely,hourly,flags'
-        if WeatherApiRequest.api_key:
-            return ApiRequest.make_api_request(
-                    cls.get_darksky_uri(WeatherApiRequest.api_key, latitude, longitude),
-                    {'exclude': exclude}
-                )
-        else:
-            return {'status': 'ERROR',
-                'error': "An API key for the Dark Sky API is required."}
+        return cls.make_weather_api_request(latitude, longitude, exclude)
