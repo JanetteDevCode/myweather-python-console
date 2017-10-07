@@ -69,7 +69,7 @@ def process_weather_choice(choice=''):
                 results['location'], results['timezone'], results['alerts'])
         # print(weather_choices['alerts']['description'])
     else:
-        print("Invalid selection.")
+        results = {'status': 'ERROR', 'error': "Invalid selection."}
 
     if results['status'] == 'ERROR':
         print(results['error'])
