@@ -78,6 +78,24 @@ def process_weather_choice(choice=''):
 
     return True
 
+def api_keys_exist():
+    if not (GeocodeApiRequest.api_key or WeatherApiRequest.api_key):
+        print("Missing API keys for geocoding and weather APIs!")
+        print("Obtain the keys and store them as environment variables")
+        print("named GOOGLEMAPS_GEOCODING_API_KEY and DARKSKY_API_KEY.")
+        return False
+    elif not GeocodeApiRequest.api_key:
+        print("Missing API key for geocoding API!")
+        print("Obtain the key and store it as an environment variable")
+        print("named GOOGLEMAPS_GEOCODING_API_KEY.")
+        return False
+    elif not WeatherApiRequest.api_key:
+        print('Missing API key for weather API!')
+        print("Obtain the key and store it as an environment variable")
+        print("named DARKSKY_API_KEY.")
+        return False
+    return True
+
 #    __  __        __          __        _   _
 #   |  \/  |       \ \        / /       | | | |
 #   | \  / |_   _   \ \  /\  / /__  __ _| |_| |__   ___ _ __
@@ -106,20 +124,7 @@ print("Geolocation powered by: Google Maps Geocoding")
 print("  [https://developers.google.com/maps/documentation/geocoding/start]")
 print()
 
-if not (GeocodeApiRequest.api_key or WeatherApiRequest.api_key):
-    print("Missing API keys for geocoding and weather APIs!")
-    print("Obtain the keys and store them as environment variables")
-    print("named GOOGLEMAPS_GEOCODING_API_KEY and DARKSKY_API_KEY.")
-    sys.exit()
-elif not GeocodeApiRequest.api_key:
-    print("Missing API key for geocoding API!")
-    print("Obtain the key and store it as an environment variable")
-    print("named GOOGLEMAPS_GEOCODING_API_KEY.")
-    sys.exit()
-elif not WeatherApiRequest.api_key:
-    print('Missing API key for weather API!')
-    print("Obtain the key and store it as an environment variable")
-    print("named DARKSKY_API_KEY.")
+if not api_keys_exist():
     sys.exit()
 
 zip_code = input("Enter ZIP code: ")
