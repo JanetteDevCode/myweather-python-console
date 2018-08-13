@@ -1,3 +1,9 @@
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
 import sys, weather_console
 from geocode_api_request import GeocodeApiRequest
 from weather_api_request import WeatherApiRequest
