@@ -83,11 +83,10 @@ def process_weather_choice(weather, choice=''):
 
     return True
 
-def get_user_zip_code():
-    # TODO: Validate format
-    return input("Enter ZIP code: ")
+def get_user_address():
+    return input("Enter address: ")
 
-def get_geocode(zip_code):
+def get_geocode(address):
     results = {
         'status': '',
         'error': '',
@@ -95,18 +94,24 @@ def get_geocode(zip_code):
         'latitude': 0,
         'longitude': 0
     }
-    geocode_json = GeocodeApiRequest.get_geocode_json(zip_code)
+    geocode_json = GeocodeApiRequest.get_geocode_json(address)
 
-    if geocode_json['status'] != 'OK':
+    if geocode_json['info']['statuscode'] != 0:
         results['status'] = 'ERROR'
         results['error'] = ("Error! Could not retrieve geocode data.")
-        if 'error' in geocode_json:
-            results['error'] += ("\n" + geocode_json['error'])
     else:
+        usa_locations = list(filter(
+                lambda location: location['adminArea1'] == "US", 
+                geocode_json['results'][0]['locations']
+            )
+        )
+        # print(usa_locations)
+        city = usa_locations[0]['adminArea5']
+        state = usa_locations[0]['adminArea3']
         results['status'] = 'OK'
-        results['location'] = geocode_json['results'][0]['formatted_address'].rstrip(', USA')
-        results['latitude'] = geocode_json['results'][0]['geometry']['location']['lat']
-        results['longitude'] = geocode_json['results'][0]['geometry']['location']['lng']
+        results['location'] = ("{city}, {state}".format(city=city, state=state))
+        results['latitude'] = usa_locations[0]['latLng']['lat']
+        results['longitude'] = usa_locations[0]['latLng']['lng']
 
     return results
 
@@ -114,12 +119,12 @@ def api_keys_exist():
     if not (GeocodeApiRequest.api_key or WeatherApiRequest.api_key):
         print("Missing API keys for geocoding and weather APIs!")
         print("Obtain the keys and store them as environment variables")
-        print("named GOOGLEMAPS_GEOCODING_API_KEY and DARKSKY_API_KEY.")
+        print("named MAPQUEST_OPEN_GEOCODING_API_KEY and DARKSKY_API_KEY.")
         return False
     elif not GeocodeApiRequest.api_key:
         print("Missing API key for geocoding API!")
         print("Obtain the key and store it as an environment variable")
-        print("named GOOGLEMAPS_GEOCODING_API_KEY.")
+        print("named MAPQUEST_OPEN_GEOCODING_API_KEY.")
         return False
     elif not WeatherApiRequest.api_key:
         print('Missing API key for weather API!')
@@ -152,14 +157,14 @@ print()
 print("Weather data powered by: Dark Sky")
 print("  [https://darksky.net/poweredby/]")
 print()
-print("Geolocation powered by: Google Maps Geocoding")
-print("  [https://developers.google.com/maps/documentation/geocoding/start]")
+print("Geolocation powered by: MapQuest Open Geocoding")
+print("  [https://developer.mapquest.com/documentation/open/geocoding-api/]")
 print()
 
 if not api_keys_exist():
     sys.exit()
 
-geocode = get_geocode(get_user_zip_code())
+geocode = get_geocode(get_user_address())
 
 if geocode['status'] == 'OK':
     print()
