@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-import sys, weather_console
+import sys, geocode_console, weather_console
 from geocode_api_request import GeocodeApiRequest
 from weather_api_request import WeatherApiRequest
+from geocode import Geocode
 from weather import Weather
 
 
@@ -164,15 +165,17 @@ print()
 if not api_keys_exist():
     sys.exit()
 
-geocode = get_geocode(get_user_address())
+locations_result = Geocode.get_locations(get_user_address())
 
-if geocode['status'] == 'OK':
+if locations_result['status'] == 'OK':
+    selected_location = geocode_console.get_user_location_choice(locations_result['locations'])
+
     print()
-    print("Location: {0}".format(geocode['location']))
-    print("Latitude: {0}, Longitude: {1}".format(geocode['latitude'], geocode['longitude']))
+    print("Location: {0}".format(selected_location['location']))
+    print("Latitude: {0}, Longitude: {1}".format(selected_location['latitude'], selected_location['longitude']))
     print()
 
-    weather = Weather(geocode['location'], geocode['latitude'], geocode['longitude'])
+    weather = Weather(selected_location['location'], selected_location['latitude'], selected_location['longitude'])
 
     while True:
         display_weather_choice_menu()
@@ -183,4 +186,24 @@ if geocode['status'] == 'OK':
             input("--- Press 'Enter' to continue. --- ")
             print()
 else:
-    print(geocode['error'])
+    print(locations_result['error'])
+
+
+# if geocode['status'] == 'OK':
+#     print()
+#     print("Location: {0}".format(geocode['location']))
+#     print("Latitude: {0}, Longitude: {1}".format(geocode['latitude'], geocode['longitude']))
+#     print()
+
+#     weather = Weather(geocode['location'], geocode['latitude'], geocode['longitude'])
+
+#     while True:
+#         display_weather_choice_menu()
+#         choice = input("Enter weather report choice: ")
+#         if not process_weather_choice(weather, choice):
+#             break
+#         else:
+#             input("--- Press 'Enter' to continue. --- ")
+#             print()
+# else:
+#     print(geocode['error'])
